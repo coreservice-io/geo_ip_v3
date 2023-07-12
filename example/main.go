@@ -23,7 +23,7 @@ func main() {
 		return
 	}
 
-	if err := client.InstallUpdate(geo_ip_update_key, "0.0.24"); err != nil {
+	if err := client.InstallUpdate(geo_ip_update_key, "0.0.0"); err != nil {
 		fmt.Println("StartAutoUpdate err:" + err.Error())
 		return
 	}

@@ -2,7 +2,6 @@ package searcher
 
 import (
 	"encoding/csv"
-	"errors"
 	"io"
 	"math/big"
 	"os"
@@ -59,9 +58,9 @@ func (s *CitySimpleSearcher) LoadFile(file_path string) error {
 		return country_ip_list[i].Start_ip_score.Cmp(country_ip_list[j].Start_ip_score) == 1
 	})
 
-	if len(country_ip_list) == 0 {
-		return errors.New("country_ipv4 len :0 ")
-	}
+	// if len(country_ip_list) == 0 {
+	// 	return errors.New("country_ipv4 len :0 ")
+	// }
 
 	s.country_ip_list = country_ip_list
 	return nil

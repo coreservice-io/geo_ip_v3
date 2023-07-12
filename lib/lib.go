@@ -43,7 +43,9 @@ func (geoip_c *GeoIpClient) InstallUpdate(update_key string, current_version str
 
 	pc, err := PrepareUpdate(update_key, current_version, false, geoip_c.datafolder,
 		func() {
-			geoip_c.ReloadCsv(geoip_c.datafolder, geoip_c.logger, geoip_c.err_logger)
+			if err := geoip_c.ReloadCsv(geoip_c.datafolder, geoip_c.logger, geoip_c.err_logger); err != nil {
+				geoip_c.err_logger(err.Error())
+			}
 		},
 		geoip_c.logger, geoip_c.err_logger)
 	if err != nil {

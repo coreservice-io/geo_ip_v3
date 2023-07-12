@@ -26,12 +26,14 @@ func PrepareUpdate(update_key string, current_version string, sync_remote_update
 			logger("starting download geoip data")
 			download_err := package_client.DownloadFile(filepath.Join(download_folder, "temp"), app_detail_s.Download_url, app_detail_s.File_hash)
 			if download_err != nil {
+				err_logger(download_err.Error())
 				return download_err
 			}
 
 			logger("starting unzip geoip data")
 			unziperr := package_client.UnZipTo(filepath.Join(download_folder, "temp"), download_folder, true)
 			if unziperr != nil {
+				err_logger(unziperr.Error())
 				return unziperr
 			}
 

@@ -2,7 +2,6 @@ package searcher
 
 import (
 	"encoding/csv"
-	"errors"
 	"io"
 	"math/big"
 	"os"
@@ -58,9 +57,9 @@ func (s *IspSearcherImpl) LoadFile(file_path string) error {
 		return isp_ip_list[i].Start_ip_score.Cmp(isp_ip_list[j].Start_ip_score) == 1
 	})
 
-	if len(isp_ip_list) == 0 {
-		return errors.New("isp_ipv6 len :0 ")
-	}
+	// if len(isp_ip_list) == 0 {
+	// 	return errors.New("isp_ipv6 len :0 ")
+	// }
 
 	s.isp_ip_list = isp_ip_list
 	return nil
