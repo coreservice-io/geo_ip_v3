@@ -19,5 +19,7 @@ type GeoInfo struct {
 
 type GeoIpInterface interface {
 	GetInfo(ip string) (*GeoInfo, error)
-	Upgrade(ignore_version bool) error //when ignore_version is true , version will be neglected,always redownload and upgrade to lastest version
+	InstallUpdate(update_key string, current_version string) error
+	StartAutoUpdate() error
+	DoUpdate(ignore_version bool) error //when ignore_version is true , version will be neglected,always redownload and upgrade to lastest version
 }

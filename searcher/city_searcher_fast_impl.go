@@ -12,7 +12,7 @@ type CityFastSearcher struct {
 	country_ip_map map[uint32]([]SORT_COUNTRY_IP)
 }
 
-func NewCitySearcherIpv4() *CityFastSearcher {
+func NewCityFastSearcher() *CityFastSearcher {
 	return &CityFastSearcher{}
 }
 

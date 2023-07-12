@@ -13,23 +13,32 @@ const geo_ip_update_key = ""
 func main() {
 
 	//////////
-	client, err := lib.NewClient(geo_ip_update_key, "0.0.24", "./example", false, func(log_str string) {
+	client, err := lib.NewClient("./example", true, func(log_str string) {
 		fmt.Println("log_str:" + log_str)
 	}, func(err_log_str string) {
 		fmt.Println("err_log_str:" + err_log_str)
 	})
-
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
 
+	if err := client.InstallUpdate(geo_ip_update_key, "0.0.24"); err != nil {
+		fmt.Println("StartAutoUpdate err:" + err.Error())
+		return
+	}
+
+	if err := client.StartAutoUpdate(); err != nil {
+		fmt.Println("StartAutoUpdate err:" + err.Error())
+		return
+	}
+
 	//initial upgrade
-	// upgrade_err := client.Upgrade(true)
-	// if upgrade_err != nil {
-	// 	log.Fatalln(upgrade_err)
-	// 	return
-	// }
+	upgrade_err := client.DoUpdate(true)
+	if upgrade_err != nil {
+		log.Fatalln(upgrade_err)
+		return
+	}
 
 	log.Println(client.GetInfo("104.233.16.169"))
 	log.Println(client.GetInfo("5.78.52.174"))

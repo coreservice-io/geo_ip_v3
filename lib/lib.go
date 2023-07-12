@@ -15,6 +15,52 @@ type GeoIpClient struct {
 	city_searcher *searcher.CitySearcher
 	isp_searcher  *searcher.IspSearcher
 	pc            *package_client.PackageClient
+	datafolder    string
+	logger        func(log_str string)
+	err_logger    func(err_log_str string)
+}
+
+func NewClient(datafolder string, startup_with_data bool,
+	logger func(log_str string), err_logger func(err_log_str string)) (GeoIpInterface, error) {
+
+	client := &GeoIpClient{
+		datafolder: datafolder,
+		logger:     logger,
+		err_logger: err_logger,
+	}
+
+	if startup_with_data {
+		if err := client.ReloadCsv(datafolder, logger, err_logger); err != nil {
+			err_logger("load_err:" + err.Error())
+			return nil, err
+		}
+	}
+
+	return client, nil
+}
+
+func (geoip_c *GeoIpClient) InstallUpdate(update_key string, current_version string) error {
+
+	pc, err := PrepareUpdate(update_key, current_version, false, geoip_c.datafolder,
+		func() {
+			geoip_c.ReloadCsv(geoip_c.datafolder, geoip_c.logger, geoip_c.err_logger)
+		},
+		geoip_c.logger, geoip_c.err_logger)
+	if err != nil {
+		return err
+	}
+
+	geoip_c.pc = pc
+	return nil
+}
+
+func (geoip_c *GeoIpClient) StartAutoUpdate() error {
+	_, err := StartAutoUpdate(geoip_c.pc)
+	return err
+}
+
+func (geoip_c *GeoIpClient) DoUpdate(ignore_version bool) error {
+	return geoip_c.pc.Update(ignore_version)
 }
 
 func (geoip_c *GeoIpClient) ReloadCsv(datafolder string,
@@ -47,35 +93,6 @@ func (geoip_c *GeoIpClient) ReloadCsv(datafolder string,
 	}
 
 	return nil
-}
-
-func NewClient(update_key string, current_version string, datafolder string, ignore_data_exist bool,
-	logger func(log_str string), err_logger func(err_log_str string)) (GeoIpInterface, error) {
-
-	client := &GeoIpClient{}
-	if !ignore_data_exist {
-		load_err := client.ReloadCsv(datafolder, logger, err_logger)
-		if load_err != nil {
-			logger("load_err:" + load_err.Error())
-			return nil, load_err
-		}
-	}
-	///
-	// pc, err := StartAutoUpdate(update_key, current_version, false, datafolder, func() {
-	// 	client.ReloadCsv(datafolder, logger, err_logger)
-	// }, logger, err_logger)
-
-	// if err != nil {
-	// 	logger("StartAutoUpdate err:" + err.Error())
-	// }
-
-	// client.pc = pc
-	////////////////////////
-	return client, nil
-}
-
-func (geoip_c *GeoIpClient) Upgrade(ignore_version bool) error {
-	return geoip_c.pc.Update(ignore_version)
 }
 
 func (geoip_c *GeoIpClient) GetInfo(target_ip string) (*GeoInfo, error) {
