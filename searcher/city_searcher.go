@@ -1,7 +1,6 @@
 package searcher
 
 import (
-	"fmt"
 	"math/big"
 )
 
@@ -29,9 +28,8 @@ var EmptyCountryIP = &SORT_COUNTRY_IP{
 }
 
 type CitySearcher struct {
-	country_ipv4_searcher *CitySearcherV1
-	country_ipv6_searcher *CitySearcherV1
-	ipv4_searcher         *CitySearcherV2
+	country_ipv4_searcher *CityFastSearcher
+	country_ipv6_searcher *CitySimpleSearcher
 
 	meta_searcher *CityMetaSearcher
 }
@@ -44,23 +42,12 @@ func (s *CitySearcher) Init(country_ipv4_path string, country_ipv6_path string, 
 	logger func(log_str string), err_logger func(err_log_str string)) error {
 
 	////
-	if !NEW_SEARCHER_IPV4 {
+	country_ipv4_searcher := NewCityFastSearcher()
 
-		country_ipv4_searcher := NewCountrySearcher()
-
-		if err := country_ipv4_searcher.LoadFile(country_ipv4_path); err != nil {
-			return err
-		} else {
-			s.country_ipv4_searcher = country_ipv4_searcher
-		}
+	if err := country_ipv4_searcher.LoadFile(country_ipv4_path); err != nil {
+		return err
 	} else {
-		ipv4_searcher := NewCitySearcherV2()
-
-		if err := ipv4_searcher.LoadFile(country_ipv4_path); err != nil {
-			return err
-		} else {
-			s.ipv4_searcher = ipv4_searcher
-		}
+		s.country_ipv4_searcher = country_ipv4_searcher
 	}
 
 	///
@@ -84,21 +71,13 @@ func (s *CitySearcher) Init(country_ipv4_path string, country_ipv6_path string, 
 }
 
 func (s *CitySearcher) SearchVal(ipVal *IpVal) (*COUNTRY_IP_INFO, error) {
-	fmt.Printf("old %s %x\n", ipVal.val, ipVal.num.Bytes())
-
-	// actually do
-	search_country := s.country_ipv4_searcher
-
-	if ipVal.typ == "ipv6" {
-		search_country = s.country_ipv6_searcher
-	}
+	// fmt.Printf("%s %x\n", ipVal.val, ipVal.num.Bytes())
 
 	var country_info *SORT_COUNTRY_IP
-	if NEW_SEARCHER_IPV4 && ipVal.typ == "ipv4" {
-		ipv4_searcher := s.ipv4_searcher
-		country_info = ipv4_searcher.Search(ipVal.val, ipVal.num)
+	if ipVal.typ == "ipv4" {
+		country_info = s.country_ipv4_searcher.Search(ipVal.num)
 	} else {
-		country_info = search_country.Search(ipVal.num)
+		country_info = s.country_ipv6_searcher.Search(ipVal.num)
 	}
 
 	if country_info == nil {

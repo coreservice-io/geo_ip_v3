@@ -37,6 +37,10 @@ func main() {
 
 	log.Println(client.GetInfo("2a7:1c44:39f3:1b::"))
 
+	log.Println(client.GetInfo("601:196:4a00:55c0::"))
+	log.Println(client.GetInfo("1000:db8::"))
+	log.Println(client.GetInfo("804:b3c::"))
+
 	time.Sleep(30 * time.Second)
 
 	log.Println(client.GetInfo("172.104.160.0"))

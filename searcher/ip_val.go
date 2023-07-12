@@ -37,3 +37,34 @@ func ParseToIpVal(ip string) (*IpVal, error) {
 		target_ip_score,
 	}, nil
 }
+
+func ExtractBucketIdxIpv4(num *big.Int) (uint32, error) {
+
+	ps := num.Bytes()
+
+	d0 := uint(ps[2])
+	d1 := uint(ps[3])
+
+	var val = uint32(0)
+	val |= uint32(d0) << 8
+	val |= uint32(d1)
+
+	// convert the ip to integer
+	return val, nil
+}
+
+// 002::/3 . from 512 (0x0200) to 1023 (0x03FF)
+func ExtractBucketIdxIpv6(num *big.Int) (uint32, error) {
+
+	ps := num.Bytes()
+
+	d0 := uint(ps[0])
+	d1 := uint(ps[1])
+
+	var val = uint32(0)
+	val |= uint32(d0) << 8
+	val |= uint32(d1)
+
+	// convert the ip to integer
+	return val, nil
+}

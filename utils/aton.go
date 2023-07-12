@@ -13,15 +13,25 @@ import (
 
 // / the second int is 32 for ipv4 or 128 for ipv6
 func IpToBigInt(ip net.IP) (*big.Int, error) {
-	val := &big.Int{}
-	val.SetBytes([]byte(ip))
-	if len(ip) == net.IPv4len {
-		return val, nil
-	} else if len(ip) == net.IPv6len {
-		return val, nil
-	} else {
-		return nil, errors.New("ip format error")
+	val := big.NewInt(0)
+	val.SetBytes(ip)
+	return val, nil
+}
+
+func Ipv4strToBigInt(ip string) (*big.Int, error) {
+	ipv := net.ParseIP(ip)
+	if ipv.To4() == nil {
+		return nil, errors.New(ip + " is not ipv4")
 	}
+	return IpToBigInt(ipv)
+}
+
+func Ipv6strToBigInt(ip string) (*big.Int, error) {
+	ipv := net.ParseIP(ip)
+	if ipv.To16() == nil {
+		return nil, errors.New(ip + " is not ipv6")
+	}
+	return IpToBigInt(ipv)
 }
 
 /****************** Below Method Need To Test ******************/

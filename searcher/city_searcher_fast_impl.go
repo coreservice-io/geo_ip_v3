@@ -2,24 +2,21 @@ package searcher
 
 import (
 	"encoding/csv"
-	"fmt"
 	"io"
 	"math/big"
 	"os"
 	"sort"
-	"strconv"
-	"strings"
 )
 
-type CitySearcherV2 struct {
+type CityFastSearcher struct {
 	country_ip_map map[uint32]([]SORT_COUNTRY_IP)
 }
 
-func NewCitySearcherV2() *CitySearcherV2 {
-	return &CitySearcherV2{}
+func NewCitySearcherIpv4() *CityFastSearcher {
+	return &CityFastSearcher{}
 }
 
-func (s *CitySearcherV2) LoadFile(file_path string) error {
+func (s *CityFastSearcher) LoadFile(file_path string) error {
 
 	fd, err := os.Open(file_path)
 	if err != nil {
@@ -57,7 +54,7 @@ func (s *CitySearcherV2) LoadFile(file_path string) error {
 			continue
 		}
 
-		bucket_idx, _ := ExtractBucketIdx(record.Start_ip)
+		bucket_idx, _ := ExtractBucketIdxIpv4(record.Start_ip_score)
 
 		if last_bucket_idx != bucket_idx {
 			for idx := last_bucket_idx + 1; idx <= bucket_idx; idx++ {
@@ -82,9 +79,9 @@ func (s *CitySearcherV2) LoadFile(file_path string) error {
 	return nil
 }
 
-func (s *CitySearcherV2) Search(target_ip string, target_ip_score *big.Int) *SORT_COUNTRY_IP {
+func (s *CityFastSearcher) Search(target_ip_score *big.Int) *SORT_COUNTRY_IP {
 
-	idx, _ := ExtractBucketIdx(target_ip)
+	idx, _ := ExtractBucketIdxIpv4(target_ip_score)
 
 	if group, ok := s.country_ip_map[idx]; !ok {
 		return nil
@@ -99,21 +96,4 @@ func (s *CitySearcherV2) Search(target_ip string, target_ip_score *big.Int) *SOR
 
 		return nil
 	}
-}
-
-func ExtractBucketIdx(ip string) (uint32, error) {
-	var ps = strings.Split(strings.TrimSpace(ip), ".")
-	if len(ps) != 4 {
-		return 0, fmt.Errorf("invalid ip address `%s`", ip)
-	}
-
-	d0, _ := strconv.Atoi(ps[0])
-	d1, _ := strconv.Atoi(ps[1])
-
-	var val = uint32(0)
-	val |= uint32(d0) << 8
-	val |= uint32(d1)
-
-	// convert the ip to integer
-	return val, nil
 }

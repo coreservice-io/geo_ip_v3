@@ -10,15 +10,15 @@ import (
 	"strconv"
 )
 
-type CitySearcherV1 struct {
+type CitySimpleSearcher struct {
 	country_ip_list []SORT_COUNTRY_IP
 }
 
-func NewCountrySearcher() *CitySearcherV1 {
-	return &CitySearcherV1{}
+func NewCountrySearcher() *CitySimpleSearcher {
+	return &CitySimpleSearcher{}
 }
 
-func (s *CitySearcherV1) LoadFile(file_path string) error {
+func (s *CitySimpleSearcher) LoadFile(file_path string) error {
 
 	fd, err := os.Open(file_path)
 	if err != nil {
@@ -67,7 +67,10 @@ func (s *CitySearcherV1) LoadFile(file_path string) error {
 	return nil
 }
 
-func (s *CitySearcherV1) Search(target_ip_score *big.Int) *SORT_COUNTRY_IP {
+func (s *CitySimpleSearcher) Search(target_ip_score *big.Int) *SORT_COUNTRY_IP {
+
+	// idx, _ := ExtractBucketIdxIpv6(target_ip_score)
+	// fmt.Printf("idx: %d (%x)\n", idx, idx)
 
 	c_len := len(s.country_ip_list)
 	country_index := sort.Search(c_len, func(j int) bool {
