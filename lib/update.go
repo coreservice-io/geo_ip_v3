@@ -6,7 +6,7 @@ import (
 	"github.com/coreservice-io/package_client"
 )
 
-const AUTO_UPDATE_CONFIG_PACKAGEID = 33
+const AUTO_UPDATE_CONFIG_PACKAGEID = 79
 const AUTO_UPDATE_CONFIG_UPDATE_INTERVAL_SECS = 300
 
 func PrepareUpdate(update_key string, current_version string, sync_remote_update_secs bool,
