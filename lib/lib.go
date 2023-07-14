@@ -3,6 +3,7 @@ package lib
 import (
 	"errors"
 	"path/filepath"
+	"runtime"
 
 	"github.com/coreservice-io/package_client"
 
@@ -45,7 +46,9 @@ func (geoip_c *GeoIpClient) InstallUpdate(update_key string, current_version str
 		func() {
 			if err := geoip_c.ReloadCsv(geoip_c.datafolder, geoip_c.logger, geoip_c.err_logger); err != nil {
 				geoip_c.err_logger(err.Error())
+				return
 			}
+			runtime.GC()
 		},
 		geoip_c.logger, geoip_c.err_logger)
 	if err != nil {
